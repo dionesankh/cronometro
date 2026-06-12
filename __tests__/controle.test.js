@@ -223,6 +223,7 @@ describe("cronômetro (timer)", () => {
   });
 
   test("does nothing if AGUARDANDO INÍCIO", () => {
+    win.pausarCronometro();
     doc.getElementById("oradorAtual").textContent = "AGUARDANDO INÍCIO";
     win.iniciarCronometro();
     jest.advanceTimersByTime(3000);

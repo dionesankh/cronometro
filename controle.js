@@ -949,6 +949,8 @@ function chamarProximoOrador(){
 
     : "Próximo Orador: ---";
 
+    iniciarCronometro();
+
     // Forçar sincronização do telão
     setTimeout(() => {
         salvarEstadoTelao();
