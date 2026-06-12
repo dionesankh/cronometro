@@ -763,14 +763,6 @@ function inscreverVereador(
 
     atualizarFilaConsideracoes();
 
-    if(
-        document
-        .getElementById("oradorAtual")
-        .textContent.trim() === "AGUARDANDO INÍCIO"
-    ){
-        chamarProximoOrador();
-    }
-
 }
 
 function atualizarFilaConsideracoes(){

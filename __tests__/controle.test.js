@@ -83,32 +83,32 @@ describe("formatarTempo", () => {
 });
 
 // ============================================================
-// inscreverVereador — queue and auto-start behaviour
+// inscreverVereador — queue behaviour
 // ============================================================
 
 describe("inscreverVereador / fila de considerações", () => {
   beforeEach(() => initApp());
   afterEach(() => jest.useRealTimers());
 
-  test("first vereador auto-starts as speaker", () => {
+  test("first vereador goes to queue without auto-starting", () => {
     expect(orador().trim()).toBe("AGUARDANDO INÍCIO");
     win.inscreverVereador("Lucas Rufino Zocóli");
-    expect(orador()).toBe("LUCAS RUFINO ZOCÓLI");
-    expect(queueItems()).toEqual([]);
+    expect(orador().trim()).toBe("AGUARDANDO INÍCIO");
+    expect(queueItems()).toEqual(["Lucas Rufino Zocóli"]);
   });
 
   test("does not add duplicate vereador", () => {
     win.inscreverVereador("Alexandre de Barros Mendes");
     win.inscreverVereador("Renato Vieira");
     win.inscreverVereador("Renato Vieira");
-    expect(queueItems()).toEqual(["Renato Vieira"]);
+    expect(queueItems()).toEqual(["Alexandre de Barros Mendes", "Renato Vieira"]);
   });
 
-  test("second inscribed vereador stays in queue", () => {
+  test("multiple inscribed vereadores all stay in queue", () => {
     win.inscreverVereador("Lucas Rufino Zocóli");
     win.inscreverVereador("Paulo Cezar Tavares");
-    expect(orador()).toBe("LUCAS RUFINO ZOCÓLI");
-    expect(queueItems()).toEqual(["Paulo Cezar Tavares"]);
+    expect(orador().trim()).toBe("AGUARDANDO INÍCIO");
+    expect(queueItems()).toEqual(["Lucas Rufino Zocóli", "Paulo Cezar Tavares"]);
   });
 });
 
@@ -119,7 +119,6 @@ describe("inscreverVereador / fila de considerações", () => {
 describe("subirOrador / descerOrador", () => {
   beforeEach(() => {
     initApp();
-    win.inscreverVereador("Alexandre de Barros Mendes"); // auto-starts
     win.inscreverVereador("Renato Vieira");
     win.inscreverVereador("Paulo Cezar Tavares");
     win.inscreverVereador("Samuel Soares da Silva");
@@ -161,35 +160,37 @@ describe("subirOrador / descerOrador", () => {
 describe("chamarProximoOrador", () => {
   beforeEach(() => {
     initApp();
-    win.inscreverVereador("Alexandre de Barros Mendes"); // auto-starts
+    win.inscreverVereador("Alexandre de Barros Mendes");
     win.inscreverVereador("Renato Vieira");
     win.inscreverVereador("Paulo Cezar Tavares");
-    // queue: [Renato, Paulo]
+    // queue: [Alexandre, Renato, Paulo]
   });
   afterEach(() => jest.useRealTimers());
 
   test("sets next speaker from queue", () => {
     win.chamarProximoOrador();
-    expect(orador()).toBe("RENATO VIEIRA");
+    expect(orador()).toBe("ALEXANDRE DE BARROS MENDES");
   });
 
   test("removes the called speaker from queue", () => {
     win.chamarProximoOrador();
-    expect(queueItems()).toEqual(["Paulo Cezar Tavares"]);
+    expect(queueItems()).toEqual(["Renato Vieira", "Paulo Cezar Tavares"]);
   });
 
   test("updates proximoOrador text", () => {
     win.chamarProximoOrador();
-    expect(proximoText()).toBe("Próximo Orador: Paulo Cezar Tavares");
+    expect(proximoText()).toBe("Próximo Orador: Renato Vieira");
   });
 
   test("shows --- when no next speaker", () => {
+    win.chamarProximoOrador();
     win.chamarProximoOrador();
     win.chamarProximoOrador();
     expect(proximoText()).toBe("Próximo Orador: ---");
   });
 
   test("does nothing if queue is empty", () => {
+    win.chamarProximoOrador();
     win.chamarProximoOrador();
     win.chamarProximoOrador();
     const before = orador();
@@ -211,6 +212,7 @@ describe("cronômetro (timer)", () => {
   beforeEach(() => {
     initApp();
     win.inscreverVereador("Alexandre de Barros Mendes");
+    win.chamarProximoOrador();
   });
   afterEach(() => jest.useRealTimers());
 
@@ -374,6 +376,7 @@ describe("salvarEstadoTelao (localStorage sync)", () => {
 
   test("reflects current speaker in saved state", () => {
     win.inscreverVereador("Renato Vieira");
+    win.chamarProximoOrador();
     const state = JSON.parse(win.localStorage.getItem("estadoCronometro"));
     expect(state.oradorAtual).toBe("RENATO VIEIRA");
   });
