@@ -50,17 +50,29 @@ FUNÇÕES DE SINCRONIZAÇÃO
 
 function salvarEstadoTelao(){
 
-    const oradorAtualElemento = document.getElementById("oradorAtual");
-    let oradorExibir = oradorAtualElemento.textContent;
+    try {
 
-    const estado = {
-        tituloSessao: tituloSessao.textContent,
-        oradorAtual: oradorExibir,
-        cronometro: document.getElementById("cronometro").textContent,
-        proximoOrador: document.getElementById("proximoOrador").textContent
-    };
+        const oradorAtualElemento = document.getElementById("oradorAtual");
+        const cronometroElemento = document.getElementById("cronometro");
+        const proximoOradorElemento = document.getElementById("proximoOrador");
 
-    localStorage.setItem('estadoCronometro', JSON.stringify(estado));
+        if(!oradorAtualElemento || !cronometroElemento || !proximoOradorElemento || !tituloSessao){
+            console.error("salvarEstadoTelao: elementos do DOM não encontrados");
+            return;
+        }
+
+        const estado = {
+            tituloSessao: tituloSessao.textContent,
+            oradorAtual: oradorAtualElemento.textContent,
+            cronometro: cronometroElemento.textContent,
+            proximoOrador: proximoOradorElemento.textContent
+        };
+
+        localStorage.setItem('estadoCronometro', JSON.stringify(estado));
+
+    } catch(e){
+        console.error("Erro ao salvar estado do telão:", e);
+    }
 
 }
 
@@ -321,10 +333,12 @@ function selecionarModo(
         tituloSessao.textContent =
         "DISCUSSÃO DE PROPOSIÇÕES";
 
-        modoDiscussao
-        .classList.add(
-            "modoAtivo"
-        );
+        if(modoDiscussaoBtn){
+            modoDiscussaoBtn
+            .classList.add(
+                "modoAtivo"
+            );
+        }
 
         carregarDiscussao();
 
@@ -338,10 +352,12 @@ function selecionarModo(
         tituloSessao.textContent =
         "CONSIDERAÇÕES FINAIS";
 
-        modoConsideracoes
-        .classList.add(
-            "modoAtivo"
-        );
+        if(modoConsideracoesBtn){
+            modoConsideracoesBtn
+            .classList.add(
+                "modoAtivo"
+            );
+        }
 
         carregarConsideracoes();
 
@@ -355,10 +371,12 @@ function selecionarModo(
         tituloSessao.textContent =
         "TRIBUNA LIVRE";
 
-        modoTribuna
-        .classList.add(
-            "modoAtivo"
-        );
+        if(modoTribunaBtn){
+            modoTribunaBtn
+            .classList.add(
+                "modoAtivo"
+            );
+        }
 
         carregarTribuna();
 
@@ -387,29 +405,68 @@ document.getElementById(
     "tituloSessao"
 );
 
-modoDiscussao
-.addEventListener(
-    "click",
-    ()=>selecionarModo(
-        "discussao"
-    )
+if(!painelEsquerdo || !painelCentro || !tituloSessao){
+    console.error(
+        "Erro de inicialização: painéis principais não encontrados no DOM"
+    );
+}
+
+const modoDiscussaoBtn =
+document.getElementById(
+    "modoDiscussao"
 );
 
-modoConsideracoes
-.addEventListener(
-    "click",
-    ()=>selecionarModo(
-        "consideracoes"
-    )
+const modoConsideracoesBtn =
+document.getElementById(
+    "modoConsideracoes"
 );
 
-modoTribuna
-.addEventListener(
-    "click",
-    ()=>selecionarModo(
-        "tribuna"
-    )
+const modoTribunaBtn =
+document.getElementById(
+    "modoTribuna"
 );
+
+if(modoDiscussaoBtn){
+    modoDiscussaoBtn
+    .addEventListener(
+        "click",
+        ()=>selecionarModo(
+            "discussao"
+        )
+    );
+} else {
+    console.error(
+        "Elemento #modoDiscussao não encontrado"
+    );
+}
+
+if(modoConsideracoesBtn){
+    modoConsideracoesBtn
+    .addEventListener(
+        "click",
+        ()=>selecionarModo(
+            "consideracoes"
+        )
+    );
+} else {
+    console.error(
+        "Elemento #modoConsideracoes não encontrado"
+    );
+}
+
+if(modoTribunaBtn){
+    modoTribunaBtn
+    .addEventListener(
+        "click",
+        ()=>selecionarModo(
+            "tribuna"
+        )
+    );
+} else {
+    console.error(
+        "Elemento #modoTribuna não encontrado"
+    );
+}
 
 selecionarModo(
     "consideracoes"
@@ -611,104 +668,115 @@ function ativarAlarme(){
 
 }
 
+function mostrarMensagemTempo(texto){
+
+    const el = document.getElementById("mensagemTempo");
+
+    if(!el){
+        console.error("Elemento #mensagemTempo não encontrado");
+        return;
+    }
+
+    el.textContent = texto;
+
+    setTimeout(()=>{
+        el.textContent = "";
+    }, 4000);
+
+}
+
 function tocarAlarme(){
 
-    // Tentar criar som com Web Audio API
     try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+
+        if(!AudioCtx){
+            console.warn("Web Audio API não suportada neste navegador");
+            mostrarMensagemTempo("⚠ Alarme sonoro indisponível");
+            return;
+        }
+
+        const audioContext = new AudioCtx();
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
-        
+
         oscillator.connect(gainNode);
         gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.value = 800; // Frequência em Hz
-        oscillator.type = 'sine'; // Tipo de onda
-        
+
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+
         gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-        
+
         oscillator.start(audioContext.currentTime);
         oscillator.stop(audioContext.currentTime + 0.5);
-        
+
     } catch(e){
-        console.log("Áudio não suportado");
+        console.error("Erro ao tocar alarme:", e);
+        mostrarMensagemTempo("⚠ Não foi possível tocar o alarme");
     }
 
 }
 
 function abrirTelao(){
 
-    window.open('telao.html', 'telao', 'width=1920,height=1080');
+    const janela = window.open('telao.html', 'telao', 'width=1920,height=1080');
+
+    if(!janela){
+        alert("Não foi possível abrir o telão. Verifique se o bloqueador de pop-ups está desativado.");
+    }
 
 }
 
-btnIniciar.addEventListener(
-    "click",
-    iniciarCronometro
-);
+function vincularBotao(id, handler){
 
-btnPausar.addEventListener(
-    "click",
-    pausarCronometro
-);
+    const el = document.getElementById(id);
 
-btnRestaurar.addEventListener(
-    "click",
-    restaurarCronometro
-);
+    if(!el){
+        console.error(
+            "Elemento #" + id + " não encontrado"
+        );
+        return;
+    }
 
-btnEncerrar.addEventListener(
-    "click",
-    encerrarCronometro
-);
+    el.addEventListener("click", handler);
 
-btnTempoExtra.addEventListener(
-    "click",
-    ativarTempoExtra
-);
+}
 
-btnAlarme.addEventListener(
-    "click",
-    ativarAlarme
-);
+vincularBotao("btnIniciar", iniciarCronometro);
+vincularBotao("btnPausar", pausarCronometro);
+vincularBotao("btnRestaurar", restaurarCronometro);
+vincularBotao("btnEncerrar", encerrarCronometro);
+vincularBotao("btnTempoExtra", ativarTempoExtra);
+vincularBotao("btnAlarme", ativarAlarme);
+vincularBotao("btnTelao", abrirTelao);
 
-btnTelao.addEventListener(
-    "click",
-    abrirTelao
-);
+vincularBotao("btnProximo", ()=>{
 
-btnProximo.addEventListener(
-    "click",
-    ()=>{
+    if(
+        modoSessao ===
+        "consideracoes"
+    ){
 
-        if(
-            modoSessao ===
-            "consideracoes"
-        ){
-
-            chamarProximoOrador();
-
-        }
+        chamarProximoOrador();
 
     }
-);
 
-btnReplica.addEventListener(
-    "click",
-    ()=>{
+});
 
-        if(
-            modoSessao ===
-            "consideracoes"
-        ){
+vincularBotao("btnReplica", ()=>{
 
-            abrirModalReplica();
+    if(
+        modoSessao ===
+        "consideracoes"
+    ){
 
-        }
+        abrirModalReplica();
 
     }
-);
+
+});
 
 function inscreverVereador(
     nome
@@ -890,10 +958,26 @@ function chamarProximoOrador(){
 
 function abrirModalReplica(){
 
-    document.getElementById("modalReplica").style.display = "flex";
+    const modal = document.getElementById("modalReplica");
+
+    if(!modal){
+        console.error("Elemento #modalReplica não encontrado");
+        return;
+    }
+
+    modal.style.display = "flex";
 
 }
 
-document.getElementById("btnCancelarReplica").addEventListener("click", ()=>{
-    document.getElementById("modalReplica").style.display = "none";
-});
+const btnCancelarReplicaEl = document.getElementById("btnCancelarReplica");
+
+if(btnCancelarReplicaEl){
+    btnCancelarReplicaEl.addEventListener("click", ()=>{
+        const modal = document.getElementById("modalReplica");
+        if(modal){
+            modal.style.display = "none";
+        }
+    });
+} else {
+    console.error("Elemento #btnCancelarReplica não encontrado");
+}
