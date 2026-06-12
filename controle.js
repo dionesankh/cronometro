@@ -272,8 +272,8 @@ function registrarConvidado(){
 
     document.getElementById("oradorAtual").textContent = nome.toUpperCase();
 
-    tempoInicial = 300;
-    tempoRestante = 300;
+    tempoInicial = 600;
+    tempoRestante = 600;
 
     atualizarCronometro();
     salvarEstadoTelao();
@@ -288,8 +288,8 @@ function selecionarVereadorTribuna(nome){
 
     document.getElementById("oradorAtual").textContent = nome.toUpperCase();
 
-    tempoInicial = 300;
-    tempoRestante = 300;
+    tempoInicial = 120;
+    tempoRestante = 120;
 
     atualizarCronometro();
     salvarEstadoTelao();
