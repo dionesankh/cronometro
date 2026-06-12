@@ -322,6 +322,16 @@ function selecionarModo(
         "proximoOrador"
     );
 
+    const btnProximoEl =
+    document.getElementById(
+        "btnProximo"
+    );
+
+    const btnReplicaEl =
+    document.getElementById(
+        "btnReplica"
+    );
+
     if(
         modo ===
         "discussao"
@@ -336,6 +346,8 @@ function selecionarModo(
         );
 
         proximoEl.style.display = "none";
+        btnProximoEl.style.display = "none";
+        btnReplicaEl.style.display = "none";
 
         carregarDiscussao();
 
@@ -355,6 +367,8 @@ function selecionarModo(
         );
 
         proximoEl.style.display = "";
+        btnProximoEl.style.display = "";
+        btnReplicaEl.style.display = "";
 
         carregarConsideracoes();
 
@@ -374,6 +388,8 @@ function selecionarModo(
         );
 
         proximoEl.style.display = "none";
+        btnProximoEl.style.display = "none";
+        btnReplicaEl.style.display = "none";
 
         carregarTribuna();
 
