@@ -113,7 +113,9 @@ setInterval(()=>{
         
         document.getElementById('tituloSessaoTelao').textContent = dados.tituloSessao || 'CONSIDERAÇÕES FINAIS';
         document.getElementById('oradorAtualTelao').textContent = dados.oradorAtual || 'AGUARDANDO INÍCIO';
-        document.getElementById('cronometroTelao').textContent = dados.cronometro || '05:00';
+        const cronEl = document.getElementById('cronometroTelao');
+        cronEl.textContent = dados.cronometro || '05:00';
+        cronEl.style.color = dados.cronometroCor || '#2e7d32';
         const proximoEl = document.getElementById('proximoOradorTelao');
         if(dados.modoSessao === 'consideracoes'){
             proximoEl.style.display = '';

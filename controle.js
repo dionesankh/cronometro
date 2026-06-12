@@ -53,10 +53,13 @@ function salvarEstadoTelao(){
     const oradorAtualElemento = document.getElementById("oradorAtual");
     let oradorExibir = oradorAtualElemento.textContent;
 
+    const cronEl = document.getElementById("cronometro");
+
     const estado = {
         tituloSessao: tituloSessao.textContent,
         oradorAtual: oradorExibir,
-        cronometro: document.getElementById("cronometro").textContent,
+        cronometro: cronEl.textContent,
+        cronometroCor: cronEl.style.color || "",
         proximoOrador: document.getElementById("proximoOrador").textContent,
         modoSessao: modoSessao
     };
@@ -509,12 +512,23 @@ function formatarTempo(segundos){
 
 function atualizarCronometro(){
 
-    document
-    .getElementById("cronometro")
-    .textContent =
+    const cronEl =
+    document.getElementById("cronometro");
+
+    cronEl.textContent =
     formatarTempo(
         tempoRestante
     );
+
+    if(tempoRestante <= 0){
+        cronEl.style.color = "#d32f2f";
+    } else if(tempoRestante <= 10){
+        cronEl.style.color = "#f57c00";
+    } else if(tempoRestante <= 30){
+        cronEl.style.color = "#f9a825";
+    } else {
+        cronEl.style.color = "";
+    }
 
     salvarEstadoTelao();
 
