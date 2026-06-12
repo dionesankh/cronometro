@@ -15,6 +15,7 @@ let filaConsideracoes = [];
 let cronometroRodando = false;
 let intervaloCronometro = null;
 let oradorAtualConsideracoes = null;
+let tempoExtraAtivo = false;
 
 /* ==========================
 VEREADORES
@@ -356,16 +357,11 @@ function selecionarOradorDiscussao(
     );
 
     atualizarHistoricoDiscussao();
-document
-.getElementById(
-    "oradorAtual"
-)
-.textContent =
-nome.toUpperCase();
-tempoInicial = 300;
-tempoRestante = 300;
+    
+    tempoInicial = 300;
+    tempoRestante = 300;
 
-atualizarCronometro();
+    atualizarCronometro();
 }
 
 
@@ -405,15 +401,18 @@ function atualizarHistoricoDiscussao(){
     });
 
 }
+
 function formatarTempo(segundos){
 
     const min =
-    Math.floor(segundos / 60);
+    Math.floor(Math.abs(segundos) / 60);
 
     const seg =
-    segundos % 60;
+    Math.abs(segundos) % 60;
 
-    return String(min)
+    const sinal = segundos < 0 ? "-" : "";
+
+    return sinal + String(min)
     .padStart(2,"0")
     + ":"
     + String(seg)
@@ -459,6 +458,7 @@ function iniciarCronometro(){
     },1000);
 
 }
+
 function pausarCronometro(){
 
     cronometroRodando = false;
@@ -491,6 +491,20 @@ function encerrarCronometro(){
 
 }
 
+function ativarTempoExtra(){
+
+    tempoExtraAtivo = !tempoExtraAtivo;
+
+    const btn = document.getElementById("btnTempoExtra");
+
+    if(tempoExtraAtivo){
+        btn.style.background = "#ff6f00";
+    } else {
+        btn.style.background = "#2b7cd3";
+    }
+
+}
+
 btnIniciar.addEventListener(
     "click",
     iniciarCronometro
@@ -510,6 +524,12 @@ btnEncerrar.addEventListener(
     "click",
     encerrarCronometro
 );
+
+btnTempoExtra.addEventListener(
+    "click",
+    ativarTempoExtra
+);
+
 btnProximo.addEventListener(
     "click",
     ()=>{
@@ -525,6 +545,7 @@ btnProximo.addEventListener(
 
     }
 );
+
 function inscreverVereador(
     nome
 ){
@@ -544,6 +565,7 @@ function inscreverVereador(
     atualizarFilaConsideracoes();
 
 }
+
 function atualizarFilaConsideracoes(){
 
     const div =
@@ -610,6 +632,7 @@ function atualizarFilaConsideracoes(){
     });
 
 }
+
 function subirOrador(
     index
 ){
@@ -630,6 +653,7 @@ function subirOrador(
     atualizarFilaConsideracoes();
 
 }
+
 function descerOrador(
     index
 ){
@@ -674,25 +698,23 @@ function chamarProximoOrador(){
     nome.toUpperCase();
 
     tempoInicial = 300;
-tempoRestante = 300;
+    tempoRestante = 300;
 
-atualizarCronometro();
+    atualizarCronometro();
 
-atualizarFilaConsideracoes();
+    atualizarFilaConsideracoes();
 
-document
-.getElementById(
-    "proximoOrador"
-)
-.textContent =
+    document
+    .getElementById(
+        "proximoOrador"
+    )
+    .textContent =
 
-filaConsideracoes.length > 0
+    filaConsideracoes.length > 0
 
-? "Próximo Orador: " +
-filaConsideracoes[0]
+    ? "Próximo Orador: " +
+    filaConsideracoes[0]
 
-: "Próximo Orador: ---";
-
-
+    : "Próximo Orador: ---";
 
 }
