@@ -734,6 +734,15 @@ function inscreverVereador(
         return;
     }
 
+    if(
+        document
+        .getElementById("oradorAtual")
+        .textContent.trim() ===
+        nome.toUpperCase()
+    ){
+        return;
+    }
+
     filaConsideracoes.push(
         nome
     );
