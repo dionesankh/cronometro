@@ -114,7 +114,13 @@ setInterval(()=>{
         document.getElementById('tituloSessaoTelao').textContent = dados.tituloSessao || 'CONSIDERAÇÕES FINAIS';
         document.getElementById('oradorAtualTelao').textContent = dados.oradorAtual || 'AGUARDANDO INÍCIO';
         document.getElementById('cronometroTelao').textContent = dados.cronometro || '05:00';
-        document.getElementById('proximoOradorTelao').textContent = dados.proximoOrador || 'Próximo Orador: ---';
+        const proximoEl = document.getElementById('proximoOradorTelao');
+        if(dados.modoSessao === 'consideracoes'){
+            proximoEl.style.display = '';
+            proximoEl.textContent = dados.proximoOrador || 'Próximo Orador: ---';
+        } else {
+            proximoEl.style.display = 'none';
+        }
         
     } catch(e){
         console.log('Erro ao sincronizar:', e);

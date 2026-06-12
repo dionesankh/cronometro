@@ -57,7 +57,8 @@ function salvarEstadoTelao(){
         tituloSessao: tituloSessao.textContent,
         oradorAtual: oradorExibir,
         cronometro: document.getElementById("cronometro").textContent,
-        proximoOrador: document.getElementById("proximoOrador").textContent
+        proximoOrador: document.getElementById("proximoOrador").textContent,
+        modoSessao: modoSessao
     };
 
     localStorage.setItem('estadoCronometro', JSON.stringify(estado));
@@ -313,6 +314,11 @@ function selecionarModo(
         )
     );
 
+    const proximoEl =
+    document.getElementById(
+        "proximoOrador"
+    );
+
     if(
         modo ===
         "discussao"
@@ -325,6 +331,8 @@ function selecionarModo(
         .classList.add(
             "modoAtivo"
         );
+
+        proximoEl.style.display = "none";
 
         carregarDiscussao();
 
@@ -343,6 +351,8 @@ function selecionarModo(
             "modoAtivo"
         );
 
+        proximoEl.style.display = "";
+
         carregarConsideracoes();
 
     }
@@ -359,6 +369,8 @@ function selecionarModo(
         .classList.add(
             "modoAtivo"
         );
+
+        proximoEl.style.display = "none";
 
         carregarTribuna();
 
@@ -750,6 +762,19 @@ function atualizarFilaConsideracoes(){
     }
 
     div.innerHTML = "";
+
+    document
+    .getElementById(
+        "proximoOrador"
+    )
+    .textContent =
+
+    filaConsideracoes.length > 0
+
+    ? "Próximo Orador: " +
+    filaConsideracoes[0]
+
+    : "Próximo Orador: ---";
 
     filaConsideracoes.forEach(
         (nome,index)=>{
