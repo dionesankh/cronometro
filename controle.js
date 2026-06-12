@@ -16,6 +16,7 @@ let cronometroRodando = false;
 let intervaloCronometro = null;
 let oradorAtualConsideracoes = null;
 let tempoExtraAtivo = false;
+let alarmeAtivo = false;
 
 /* ==========================
 VEREADORES
@@ -455,6 +456,11 @@ function iniciarCronometro(){
 
         atualizarCronometro();
 
+        // Verificar se deve ativar alarme ao chegar em 00:00
+        if(tempoRestante === 0 && alarmeAtivo){
+            tocarAlarme();
+        }
+
     },1000);
 
 }
@@ -499,8 +505,52 @@ function ativarTempoExtra(){
 
     if(tempoExtraAtivo){
         btn.style.background = "#ff6f00";
+        btn.textContent = "🟠 Tempo Extra";
     } else {
         btn.style.background = "#2b7cd3";
+        btn.textContent = "🟢 Tempo Extra";
+    }
+
+}
+
+function ativarAlarme(){
+
+    alarmeAtivo = !alarmeAtivo;
+
+    const btn = document.getElementById("btnAlarme");
+
+    if(alarmeAtivo){
+        btn.style.background = "#ff6f00";
+        btn.textContent = "🟠 Alarme";
+    } else {
+        btn.style.background = "#2b7cd3";
+        btn.textContent = "🟢 Alarme";
+    }
+
+}
+
+function tocarAlarme(){
+
+    // Tentar criar som com Web Audio API
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = 800; // Frequência em Hz
+        oscillator.type = 'sine'; // Tipo de onda
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+        
+    } catch(e){
+        console.log("Áudio não suportado");
     }
 
 }
@@ -528,6 +578,11 @@ btnEncerrar.addEventListener(
 btnTempoExtra.addEventListener(
     "click",
     ativarTempoExtra
+);
+
+btnAlarme.addEventListener(
+    "click",
+    ativarAlarme
 );
 
 btnProximo.addEventListener(
