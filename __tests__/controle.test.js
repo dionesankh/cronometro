@@ -92,23 +92,23 @@ describe("inscreverVereador / fila de considerações", () => {
 
   test("first vereador goes to queue without auto-starting", () => {
     expect(orador().trim()).toBe("AGUARDANDO INÍCIO");
-    win.inscreverVereador("Lucas Rufino Zocóli");
+    win.inscreverVereador("Vereador Lucas Rufino Zocóli");
     expect(orador().trim()).toBe("AGUARDANDO INÍCIO");
-    expect(queueItems()).toEqual(["Lucas Rufino Zocóli"]);
+    expect(queueItems()).toEqual(["Vereador Lucas Rufino Zocóli"]);
   });
 
   test("does not add duplicate vereador", () => {
-    win.inscreverVereador("Alexandre de Barros Mendes");
-    win.inscreverVereador("Renato Vieira");
-    win.inscreverVereador("Renato Vieira");
-    expect(queueItems()).toEqual(["Alexandre de Barros Mendes", "Renato Vieira"]);
+    win.inscreverVereador("Vereador Alexandre de Barros Mendes");
+    win.inscreverVereador("Vereador Renato Vieira");
+    win.inscreverVereador("Vereador Renato Vieira");
+    expect(queueItems()).toEqual(["Vereador Alexandre de Barros Mendes", "Vereador Renato Vieira"]);
   });
 
   test("multiple inscribed vereadores all stay in queue", () => {
-    win.inscreverVereador("Lucas Rufino Zocóli");
-    win.inscreverVereador("Paulo Cezar Tavares");
+    win.inscreverVereador("Vereador Lucas Rufino Zocóli");
+    win.inscreverVereador("Vereador Paulo Cezar Tavares");
     expect(orador().trim()).toBe("AGUARDANDO INÍCIO");
-    expect(queueItems()).toEqual(["Lucas Rufino Zocóli", "Paulo Cezar Tavares"]);
+    expect(queueItems()).toEqual(["Vereador Lucas Rufino Zocóli", "Vereador Paulo Cezar Tavares"]);
   });
 });
 
@@ -119,9 +119,9 @@ describe("inscreverVereador / fila de considerações", () => {
 describe("subirOrador / descerOrador", () => {
   beforeEach(() => {
     initApp();
-    win.inscreverVereador("Renato Vieira");
-    win.inscreverVereador("Paulo Cezar Tavares");
-    win.inscreverVereador("Samuel Soares da Silva");
+    win.inscreverVereador("Vereador Renato Vieira");
+    win.inscreverVereador("Vereador Paulo Cezar Tavares");
+    win.inscreverVereador("Vereador Samuel Soares da Silva");
     // queue: [Renato, Paulo, Samuel]
   });
   afterEach(() => jest.useRealTimers());
@@ -129,8 +129,8 @@ describe("subirOrador / descerOrador", () => {
   test("subirOrador swaps element up", () => {
     win.subirOrador(1);
     const q = queueItems();
-    expect(q[0]).toBe("Paulo Cezar Tavares");
-    expect(q[1]).toBe("Renato Vieira");
+    expect(q[0]).toBe("Vereador Paulo Cezar Tavares");
+    expect(q[1]).toBe("Vereador Renato Vieira");
   });
 
   test("subirOrador at index 0 does nothing", () => {
@@ -142,8 +142,8 @@ describe("subirOrador / descerOrador", () => {
   test("descerOrador swaps element down", () => {
     win.descerOrador(0);
     const q = queueItems();
-    expect(q[0]).toBe("Paulo Cezar Tavares");
-    expect(q[1]).toBe("Renato Vieira");
+    expect(q[0]).toBe("Vereador Paulo Cezar Tavares");
+    expect(q[1]).toBe("Vereador Renato Vieira");
   });
 
   test("descerOrador at last index does nothing", () => {
@@ -160,26 +160,26 @@ describe("subirOrador / descerOrador", () => {
 describe("chamarProximoOrador", () => {
   beforeEach(() => {
     initApp();
-    win.inscreverVereador("Alexandre de Barros Mendes");
-    win.inscreverVereador("Renato Vieira");
-    win.inscreverVereador("Paulo Cezar Tavares");
+    win.inscreverVereador("Vereador Alexandre de Barros Mendes");
+    win.inscreverVereador("Vereador Renato Vieira");
+    win.inscreverVereador("Vereador Paulo Cezar Tavares");
     // queue: [Alexandre, Renato, Paulo]
   });
   afterEach(() => jest.useRealTimers());
 
   test("sets next speaker from queue", () => {
     win.chamarProximoOrador();
-    expect(orador()).toBe("ALEXANDRE DE BARROS MENDES");
+    expect(orador()).toBe("VEREADOR ALEXANDRE DE BARROS MENDES");
   });
 
   test("removes the called speaker from queue", () => {
     win.chamarProximoOrador();
-    expect(queueItems()).toEqual(["Renato Vieira", "Paulo Cezar Tavares"]);
+    expect(queueItems()).toEqual(["Vereador Renato Vieira", "Vereador Paulo Cezar Tavares"]);
   });
 
   test("updates proximoOrador text", () => {
     win.chamarProximoOrador();
-    expect(proximoText()).toBe("Próximo Orador: Renato Vieira");
+    expect(proximoText()).toBe("Próximo Orador: Vereador Renato Vieira");
   });
 
   test("shows --- when no next speaker", () => {
@@ -211,7 +211,7 @@ describe("chamarProximoOrador", () => {
 describe("cronômetro (timer)", () => {
   beforeEach(() => {
     initApp();
-    win.inscreverVereador("Alexandre de Barros Mendes");
+    win.inscreverVereador("Vereador Alexandre de Barros Mendes");
     win.chamarProximoOrador();
   });
   afterEach(() => jest.useRealTimers());
@@ -318,14 +318,14 @@ describe("selecionarOradorDiscussao", () => {
   afterEach(() => jest.useRealTimers());
 
   test("sets orador and adds to history", () => {
-    win.selecionarOradorDiscussao("Renato Vieira");
-    expect(orador()).toBe("RENATO VIEIRA");
+    win.selecionarOradorDiscussao("Vereador Renato Vieira");
+    expect(orador()).toBe("VEREADOR RENATO VIEIRA");
     const histEl = doc.getElementById("historicoDiscussao");
-    expect(histEl.textContent).toContain("Renato Vieira");
+    expect(histEl.textContent).toContain("Vereador Renato Vieira");
   });
 
   test("resets timer to 05:00", () => {
-    win.selecionarOradorDiscussao("Renato Vieira");
+    win.selecionarOradorDiscussao("Vereador Renato Vieira");
     expect(cronometroText()).toBe("05:00");
   });
 });
@@ -375,9 +375,9 @@ describe("salvarEstadoTelao (localStorage sync)", () => {
   });
 
   test("reflects current speaker in saved state", () => {
-    win.inscreverVereador("Renato Vieira");
+    win.inscreverVereador("Vereador Renato Vieira");
     win.chamarProximoOrador();
     const state = JSON.parse(win.localStorage.getItem("estadoCronometro"));
-    expect(state.oradorAtual).toBe("RENATO VIEIRA");
+    expect(state.oradorAtual).toBe("VEREADOR RENATO VIEIRA");
   });
 });

@@ -26,21 +26,21 @@ VEREADORES
 
 const vereadores = [
 
-"Alexandre de Barros Mendes",
-"Aline Moreira Silva Melo",
-"André Eustaquio Alves",
-"Antônio Domingos Ximendes Trindade",
-"Aparecida Sônia Ferreira Vidal",
-"Breno Reis de Oliveira",
-"Gilson Fazolla Filgueiras",
-"Jane Cristina Lacerda Pinto",
-"José Maria Fernandes",
-"José Roberto Reis Filgueiras",
-"Lucas Rufino Zocóli",
-"Marilda Aparecida Leoncio",
-"Paulo Cezar Tavares",
-"Renato Vieira",
-"Samuel Soares da Silva"
+"Vereador Alexandre de Barros Mendes",
+"Vereadora Aline Moreira Silva Melo",
+"Vereador André Eustaquio Alves",
+"Vereador Antônio Domingos Ximendes Trindade",
+"Vereadora Aparecida Sônia Ferreira Vidal",
+"Vereador Breno Reis de Oliveira",
+"Vereador Gilson Fazolla Filgueiras",
+"Vereadora Jane Cristina Lacerda Pinto",
+"Vereador José Maria Fernandes",
+"Vereador José Roberto Reis Filgueiras",
+"Vereador Lucas Rufino Zocóli",
+"Vereadora Marilda Aparecida Leoncio",
+"Vereador Paulo Cezar Tavares",
+"Vereador Renato Vieira",
+"Vereador Samuel Soares da Silva"
 
 ];
 
