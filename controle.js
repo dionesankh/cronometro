@@ -513,7 +513,7 @@ function iniciarCronometro(){
     if(
         document
         .getElementById("oradorAtual")
-        .textContent ===
+        .textContent.trim() ===
         "AGUARDANDO INÍCIO"
     ){
         return;
@@ -727,6 +727,14 @@ function inscreverVereador(
     );
 
     atualizarFilaConsideracoes();
+
+    if(
+        document
+        .getElementById("oradorAtual")
+        .textContent.trim() === "AGUARDANDO INÍCIO"
+    ){
+        chamarProximoOrador();
+    }
 
 }
 
