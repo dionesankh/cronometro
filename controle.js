@@ -268,6 +268,8 @@ function registrarConvidado(){
         return;
     }
 
+    pausarCronometro();
+
     oradorTribunaLivre = nome;
 
     document.getElementById("oradorAtual").textContent = nome.toUpperCase();
@@ -283,6 +285,8 @@ function registrarConvidado(){
 }
 
 function selecionarVereadorTribuna(nome){
+
+    pausarCronometro();
 
     oradorTribunaLivre = nome;
 
