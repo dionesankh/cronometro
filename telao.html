@@ -105,22 +105,58 @@ body{
 
 <script>
 
-// Sincronizar com a aba principal usando localStorage
-setInterval(()=>{
-    
+let errosSyncConsecutivos = 0;
+
+function sincronizarTelao(){
+
     try{
-        const dados = JSON.parse(localStorage.getItem('estadoCronometro') || '{}');
-        
-        document.getElementById('tituloSessaoTelao').textContent = dados.tituloSessao || 'CONSIDERAÇÕES FINAIS';
-        document.getElementById('oradorAtualTelao').textContent = dados.oradorAtual || 'AGUARDANDO INÍCIO';
-        document.getElementById('cronometroTelao').textContent = dados.cronometro || '05:00';
-        document.getElementById('proximoOradorTelao').textContent = dados.proximoOrador || 'Próximo Orador: ---';
-        
+
+        const raw = localStorage.getItem('estadoCronometro');
+
+        if(!raw){
+            return;
+        }
+
+        const dados = JSON.parse(raw);
+
+        const tituloEl = document.getElementById('tituloSessaoTelao');
+        const oradorEl = document.getElementById('oradorAtualTelao');
+        const cronoEl = document.getElementById('cronometroTelao');
+        const proxEl = document.getElementById('proximoOradorTelao');
+
+        if(!tituloEl || !oradorEl || !cronoEl || !proxEl){
+            console.error('Telão: elementos do DOM não encontrados');
+            return;
+        }
+
+        tituloEl.textContent = dados.tituloSessao || 'CONSIDERAÇÕES FINAIS';
+        oradorEl.textContent = dados.oradorAtual || 'AGUARDANDO INÍCIO';
+        cronoEl.textContent = dados.cronometro || '05:00';
+        proxEl.textContent = dados.proximoOrador || 'Próximo Orador: ---';
+
+        if(errosSyncConsecutivos > 0){
+            oradorEl.style.color = '';
+            errosSyncConsecutivos = 0;
+        }
+
     } catch(e){
-        console.log('Erro ao sincronizar:', e);
+
+        errosSyncConsecutivos++;
+        console.error('Erro ao sincronizar telão:', e);
+
+        if(errosSyncConsecutivos >= 3){
+            const oradorEl = document.getElementById('oradorAtualTelao');
+            if(oradorEl){
+                oradorEl.textContent = '⚠ ERRO DE SINCRONIZAÇÃO';
+                oradorEl.style.color = '#d32f2f';
+            }
+        }
+
     }
-    
-}, 500);
+
+}
+
+setInterval(sincronizarTelao, 500);
 
 </script>
 
