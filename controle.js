@@ -17,6 +17,8 @@ let intervaloCronometro = null;
 let oradorAtualConsideracoes = null;
 let tempoExtraAtivo = false;
 let alarmeAtivo = false;
+let oradorTribunaLivre = null;
+let filaReplicas = [];
 
 /* ==========================
 VEREADORES
@@ -48,9 +50,12 @@ FUNÇÕES DE SINCRONIZAÇÃO
 
 function salvarEstadoTelao(){
 
+    const oradorAtualElemento = document.getElementById("oradorAtual");
+    let oradorExibir = oradorAtualElemento.textContent;
+
     const estado = {
         tituloSessao: tituloSessao.textContent,
-        oradorAtual: document.getElementById("oradorAtual").textContent,
+        oradorAtual: oradorExibir,
         cronometro: document.getElementById("cronometro").textContent,
         proximoOrador: document.getElementById("proximoOrador").textContent
     };
@@ -232,9 +237,58 @@ function carregarTribuna(){
         btn.className =
         "botaoVereador";
 
+        btn.onclick = ()=>{
+
+            selecionarVereadorTribuna(
+                nome
+            );
+
+        };
+
         lista.appendChild(btn);
 
     });
+
+    // Adicionar listener para registrar convidado
+    document.getElementById("btnRegistrarConvidado").addEventListener("click", registrarConvidado);
+
+}
+
+function registrarConvidado(){
+
+    const nomeInput = document.getElementById("nomeConvidado");
+    const nome = nomeInput.value.trim();
+
+    if(nome === ""){
+        alert("Por favor, insira um nome");
+        return;
+    }
+
+    oradorTribunaLivre = nome;
+
+    document.getElementById("oradorAtual").textContent = nome.toUpperCase();
+
+    tempoInicial = 300;
+    tempoRestante = 300;
+
+    atualizarCronometro();
+    salvarEstadoTelao();
+
+    nomeInput.value = "";
+
+}
+
+function selecionarVereadorTribuna(nome){
+
+    oradorTribunaLivre = nome;
+
+    document.getElementById("oradorAtual").textContent = nome.toUpperCase();
+
+    tempoInicial = 300;
+    tempoRestante = 300;
+
+    atualizarCronometro();
+    salvarEstadoTelao();
 
 }
 
@@ -517,6 +571,10 @@ function encerrarCronometro(){
     .textContent =
     "AGUARDANDO INÍCIO";
 
+    if(modoSessao === "tribuna"){
+        oradorTribunaLivre = null;
+    }
+
     salvarEstadoTelao();
 
 }
@@ -630,6 +688,22 @@ btnProximo.addEventListener(
         ){
 
             chamarProximoOrador();
+
+        }
+
+    }
+);
+
+btnReplica.addEventListener(
+    "click",
+    ()=>{
+
+        if(
+            modoSessao ===
+            "consideracoes"
+        ){
+
+            abrirModalReplica();
 
         }
 
@@ -810,3 +884,13 @@ function chamarProximoOrador(){
     salvarEstadoTelao();
 
 }
+
+function abrirModalReplica(){
+
+    document.getElementById("modalReplica").style.display = "flex";
+
+}
+
+document.getElementById("btnCancelarReplica").addEventListener("click", ()=>{
+    document.getElementById("modalReplica").style.display = "none";
+});
