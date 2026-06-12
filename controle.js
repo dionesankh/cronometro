@@ -43,6 +43,23 @@ const vereadores = [
 ];
 
 /* ==========================
+FUNÇÕES DE SINCRONIZAÇÃO
+========================== */
+
+function salvarEstadoTelao(){
+
+    const estado = {
+        tituloSessao: tituloSessao.textContent,
+        oradorAtual: document.getElementById("oradorAtual").textContent,
+        cronometro: document.getElementById("cronometro").textContent,
+        proximoOrador: document.getElementById("proximoOrador").textContent
+    };
+
+    localStorage.setItem('estadoCronometro', JSON.stringify(estado));
+
+}
+
+/* ==========================
 TELAS
 ========================== */
 
@@ -293,6 +310,8 @@ function selecionarModo(
 
     }
 
+    salvarEstadoTelao();
+
 }
 
 /* ==========================
@@ -363,6 +382,7 @@ function selecionarOradorDiscussao(
     tempoRestante = 300;
 
     atualizarCronometro();
+    salvarEstadoTelao();
 }
 
 
@@ -430,6 +450,8 @@ function atualizarCronometro(){
         tempoRestante
     );
 
+    salvarEstadoTelao();
+
 }
 
 function iniciarCronometro(){
@@ -495,6 +517,8 @@ function encerrarCronometro(){
     .textContent =
     "AGUARDANDO INÍCIO";
 
+    salvarEstadoTelao();
+
 }
 
 function ativarTempoExtra(){
@@ -555,6 +579,12 @@ function tocarAlarme(){
 
 }
 
+function abrirTelao(){
+
+    window.open('telao.html', 'telao', 'width=1920,height=1080');
+
+}
+
 btnIniciar.addEventListener(
     "click",
     iniciarCronometro
@@ -583,6 +613,11 @@ btnTempoExtra.addEventListener(
 btnAlarme.addEventListener(
     "click",
     ativarAlarme
+);
+
+btnTelao.addEventListener(
+    "click",
+    abrirTelao
 );
 
 btnProximo.addEventListener(
@@ -771,5 +806,7 @@ function chamarProximoOrador(){
     filaConsideracoes[0]
 
     : "Próximo Orador: ---";
+
+    salvarEstadoTelao();
 
 }
