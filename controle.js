@@ -21,6 +21,80 @@ let oradorTribunaLivre = null;
 let filaReplicas = [];
 
 /* ==========================
+UTILITÁRIOS COMPARTILHADOS
+========================== */
+
+function criarListaVereadores(containerId, onClick){
+
+    const lista =
+    document.getElementById(
+        containerId
+    );
+
+    vereadores.forEach(nome=>{
+
+        const btn =
+        document.createElement(
+            "button"
+        );
+
+        btn.textContent =
+        nome;
+
+        btn.className =
+        "botaoVereador";
+
+        btn.onclick = ()=>{
+            onClick(nome);
+        };
+
+        lista.appendChild(
+            btn
+        );
+
+    });
+
+}
+
+function definirOradorAtual(nome){
+
+    document
+    .getElementById("oradorAtual")
+    .textContent =
+    nome.toUpperCase();
+
+}
+
+function resetarTempo(tempo){
+
+    tempoInicial = tempo;
+    tempoRestante = tempo;
+
+    atualizarCronometro();
+    salvarEstadoTelao();
+
+}
+
+function toggleBotao(btnId, estadoRef, labelAtivo, labelInativo){
+
+    const novoEstado = !estadoRef.valor;
+    estadoRef.valor = novoEstado;
+
+    const btn = document.getElementById(btnId);
+
+    if(novoEstado){
+        btn.style.background = "#ff6f00";
+        btn.textContent = labelAtivo;
+    } else {
+        btn.style.background = "#2b7cd3";
+        btn.textContent = labelInativo;
+    }
+
+    return novoEstado;
+
+}
+
+/* ==========================
 VEREADORES
 ========================== */
 
@@ -86,37 +160,10 @@ function carregarDiscussao(){
 
     `;
 
-    const lista =
-    document.getElementById(
-        "listaDiscussao"
+    criarListaVereadores(
+        "listaDiscussao",
+        selecionarOradorDiscussao
     );
-
-    vereadores.forEach(nome=>{
-
-        const btn =
-        document.createElement(
-            "button"
-        );
-
-        btn.textContent =
-        nome;
-
-        btn.className =
-        "botaoVereador";
-
-        btn.onclick = ()=>{
-
-            selecionarOradorDiscussao(
-                nome
-            );
-
-        };
-
-        lista.appendChild(
-            btn
-        );
-
-    });
 
     atualizarHistoricoDiscussao();
 
@@ -152,37 +199,10 @@ function carregarConsideracoes(){
 
     `;
 
-    const lista =
-    document.getElementById(
-        "listaConsideracoes"
+    criarListaVereadores(
+        "listaConsideracoes",
+        inscreverVereador
     );
-
-    vereadores.forEach(nome=>{
-
-        const btn =
-        document.createElement(
-            "button"
-        );
-
-        btn.textContent =
-        nome;
-
-        btn.className =
-        "botaoVereador";
-
-        btn.onclick = ()=>{
-
-            inscreverVereador(
-                nome
-            );
-
-        };
-
-        lista.appendChild(
-            btn
-        );
-
-    });
 
     atualizarFilaConsideracoes();
 
@@ -219,37 +239,11 @@ function carregarTribuna(){
 
     `;
 
-    const lista =
-    document.getElementById(
-        "listaComentarios"
+    criarListaVereadores(
+        "listaComentarios",
+        selecionarVereadorTribuna
     );
 
-    vereadores.forEach(nome=>{
-
-        const btn =
-        document.createElement(
-            "button"
-        );
-
-        btn.textContent =
-        nome;
-
-        btn.className =
-        "botaoVereador";
-
-        btn.onclick = ()=>{
-
-            selecionarVereadorTribuna(
-                nome
-            );
-
-        };
-
-        lista.appendChild(btn);
-
-    });
-
-    // Adicionar listener para registrar convidado
     document.getElementById("btnRegistrarConvidado").addEventListener("click", registrarConvidado);
 
 }
@@ -266,13 +260,8 @@ function registrarConvidado(){
 
     oradorTribunaLivre = nome;
 
-    document.getElementById("oradorAtual").textContent = nome.toUpperCase();
-
-    tempoInicial = 300;
-    tempoRestante = 300;
-
-    atualizarCronometro();
-    salvarEstadoTelao();
+    definirOradorAtual(nome);
+    resetarTempo(300);
 
     nomeInput.value = "";
 
@@ -282,13 +271,8 @@ function selecionarVereadorTribuna(nome){
 
     oradorTribunaLivre = nome;
 
-    document.getElementById("oradorAtual").textContent = nome.toUpperCase();
-
-    tempoInicial = 300;
-    tempoRestante = 300;
-
-    atualizarCronometro();
-    salvarEstadoTelao();
+    definirOradorAtual(nome);
+    resetarTempo(300);
 
 }
 
@@ -419,24 +403,15 @@ function selecionarOradorDiscussao(
     nome
 ){
 
-    document
-    .getElementById(
-        "oradorAtual"
-    )
-    .textContent =
-    nome.toUpperCase();
+    definirOradorAtual(nome);
 
     historicoDiscussao.push(
         nome
     );
 
     atualizarHistoricoDiscussao();
-    
-    tempoInicial = 300;
-    tempoRestante = 300;
 
-    atualizarCronometro();
-    salvarEstadoTelao();
+    resetarTempo(300);
 }
 
 
@@ -579,35 +554,32 @@ function encerrarCronometro(){
 
 }
 
+const estadoTempoExtra = { valor: false };
+const estadoAlarme = { valor: false };
+
 function ativarTempoExtra(){
 
-    tempoExtraAtivo = !tempoExtraAtivo;
+    toggleBotao(
+        "btnTempoExtra",
+        estadoTempoExtra,
+        "🟠 Tempo Extra",
+        "🟢 Tempo Extra"
+    );
 
-    const btn = document.getElementById("btnTempoExtra");
-
-    if(tempoExtraAtivo){
-        btn.style.background = "#ff6f00";
-        btn.textContent = "🟠 Tempo Extra";
-    } else {
-        btn.style.background = "#2b7cd3";
-        btn.textContent = "🟢 Tempo Extra";
-    }
+    tempoExtraAtivo = estadoTempoExtra.valor;
 
 }
 
 function ativarAlarme(){
 
-    alarmeAtivo = !alarmeAtivo;
+    toggleBotao(
+        "btnAlarme",
+        estadoAlarme,
+        "🟠 Alarme",
+        "🟢 Alarme"
+    );
 
-    const btn = document.getElementById("btnAlarme");
-
-    if(alarmeAtivo){
-        btn.style.background = "#ff6f00";
-        btn.textContent = "🟠 Alarme";
-    } else {
-        btn.style.background = "#2b7cd3";
-        btn.textContent = "🟢 Alarme";
-    }
+    alarmeAtivo = estadoAlarme.valor;
 
 }
 
@@ -856,10 +828,7 @@ function chamarProximoOrador(){
     oradorAtualConsideracoes =
     nome;
 
-    document
-    .getElementById("oradorAtual")
-    .textContent =
-    nome.toUpperCase();
+    definirOradorAtual(nome);
 
     tempoInicial = 300;
     tempoRestante = 300;
