@@ -1,6 +1,16 @@
 "use strict";
 
 /* ==========================
+UTILITÁRIOS
+========================== */
+
+function escaparHTML(texto){
+    const div = document.createElement("div");
+    div.textContent = texto;
+    return div.innerHTML;
+}
+
+/* ==========================
 ESTADO GLOBAL
 ========================== */
 
@@ -257,7 +267,7 @@ function carregarTribuna(){
 function registrarConvidado(){
 
     const nomeInput = document.getElementById("nomeConvidado");
-    const nome = nomeInput.value.trim();
+    const nome = nomeInput.value.trim().replace(/<[^>]*>/g, "");
 
     if(nome === ""){
         alert("Por favor, insira um nome");
@@ -754,40 +764,51 @@ function atualizarFilaConsideracoes(){
         item.className =
         "itemFila";
 
-        item.innerHTML = `
+        const span =
+        document.createElement(
+            "span"
+        );
 
-            <span>
+        span.textContent =
+        (index+1) + "º " + nome;
 
-                ${index+1}º
-                ${nome}
+        const btnContainer =
+        document.createElement(
+            "div"
+        );
 
-            </span>
+        const btnSubir =
+        document.createElement(
+            "button"
+        );
 
-            <div>
+        btnSubir.textContent = "▲";
+        btnSubir.addEventListener(
+            "click",
+            ()=> subirOrador(index)
+        );
 
-                <button
-                onclick="
-                subirOrador(
-                ${index}
-                )">
+        const btnDescer =
+        document.createElement(
+            "button"
+        );
 
-                ▲
+        btnDescer.textContent = "▼";
+        btnDescer.addEventListener(
+            "click",
+            ()=> descerOrador(index)
+        );
 
-                </button>
+        btnContainer.appendChild(
+            btnSubir
+        );
 
-                <button
-                onclick="
-                descerOrador(
-                ${index}
-                )">
+        btnContainer.appendChild(
+            btnDescer
+        );
 
-                ▼
-
-                </button>
-
-            </div>
-
-        `;
+        item.appendChild(span);
+        item.appendChild(btnContainer);
 
         div.appendChild(
             item
