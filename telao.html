@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+Telão - Cronômetro
+</title>
+
+<style>
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: Arial, sans-serif;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: white;
+}
+
+.container-telao{
+    text-align: center;
+    width: 100%;
+    padding: 40px;
+}
+
+.titulo-sessao-telao{
+    font-size: 48px;
+    font-weight: bold;
+    color: #1f73d2;
+    margin-bottom: 40px;
+}
+
+.status-telao{
+    font-size: 72px;
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.orador-atual-telao{
+    font-size: 96px;
+    font-weight: bold;
+    color: #1f73d2;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+}
+
+.cronometro-telao{
+    font-size: 200px;
+    font-weight: bold;
+    color: #2e7d32;
+    margin-bottom: 30px;
+    font-family: 'Courier New', monospace;
+}
+
+.proximo-orador-telao{
+    font-size: 48px;
+    color: #888;
+    margin-top: 40px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container-telao">
+
+    <div class="titulo-sessao-telao" id="tituloSessaoTelao">
+        CONSIDERAÇÕES FINAIS
+    </div>
+
+    <div class="status-telao">
+        USANDO A PALAVRA
+    </div>
+
+    <div class="orador-atual-telao" id="oradorAtualTelao">
+        AGUARDANDO INÍCIO
+    </div>
+
+    <div class="cronometro-telao" id="cronometroTelao">
+        05:00
+    </div>
+
+    <div class="proximo-orador-telao" id="proximoOradorTelao">
+        Próximo Orador: ---
+    </div>
+
+</div>
+
+<script>
+
+// Sincronizar com a aba principal usando localStorage
+setInterval(()=>{
+    
+    try{
+        const dados = JSON.parse(localStorage.getItem('estadoCronometro') || '{}');
+        
+        document.getElementById('tituloSessaoTelao').textContent = dados.tituloSessao || 'CONSIDERAÇÕES FINAIS';
+        document.getElementById('oradorAtualTelao').textContent = dados.oradorAtual || 'AGUARDANDO INÍCIO';
+        document.getElementById('cronometroTelao').textContent = dados.cronometro || '05:00';
+        document.getElementById('proximoOradorTelao').textContent = dados.proximoOrador || 'Próximo Orador: ---';
+        
+    } catch(e){
+        console.log('Erro ao sincronizar:', e);
+    }
+    
+}, 500);
+
+</script>
+
+</body>
+
+</html>
