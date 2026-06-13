@@ -29,6 +29,27 @@ body{
     align-items: center;
     height: 100vh;
     color: white;
+    position: relative;
+}
+
+body::before{
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('Brasao_Uba.png') center center no-repeat;
+    background-size: contain;
+    opacity: 0.1;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.container-telao,
+.relogio-telao{
+    position: relative;
+    z-index: 1;
 }
 
 .container-telao{
@@ -38,33 +59,34 @@ body{
 }
 
 .titulo-sessao-telao{
-    font-size: 48px;
+    font-size: 60px;
     font-weight: bold;
-    color: #1f73d2;
-    margin-bottom: 40px;
+    color: #fff;
+    margin-bottom: 140px;
 }
 
 .status-telao{
-    font-size: 72px;
+    font-size: 60px;
     font-weight: bold;
-    color: #666;
-    margin-bottom: 30px;
+    color: #fff;
+    margin-bottom: 80px;
 }
 
 .orador-atual-telao{
-    font-size: 96px;
+    font-size: 70px;
     font-weight: bold;
-    color: #1f73d2;
-    margin-bottom: 30px;
+    color: #fff;
+    margin-bottom: 40px;
     text-transform: uppercase;
 }
 
 .cronometro-telao{
     font-size: 200px;
     font-weight: bold;
-    color: #2e7d32;
-    margin-bottom: 30px;
-    font-family: 'Courier New', monospace;
+    color: #0787d9;
+    margin-bottom: 40px;
+    font-family: Arial, sans-serif;
+	
 }
 
 .proximo-orador-telao{
@@ -73,11 +95,23 @@ body{
     margin-top: 40px;
 }
 
+.relogio-telao{
+    position: fixed;
+    top: 10px;
+    right: 15px;
+    font-size: 30px;
+    color: #fff;
+    text-align: right;
+    line-height: 1.4;
+}
+
 </style>
 
 </head>
 
 <body>
+
+<div class="relogio-telao" id="relogioTelao"></div>
 
 <div class="container-telao">
 
@@ -86,7 +120,7 @@ body{
     </div>
 
     <div class="status-telao">
-        USANDO A PALAVRA
+        USANDO A PALAVRA:
     </div>
 
     <div class="orador-atual-telao" id="oradorAtualTelao">
@@ -113,14 +147,35 @@ setInterval(()=>{
         
         document.getElementById('tituloSessaoTelao').textContent = dados.tituloSessao || 'CONSIDERAÇÕES FINAIS';
         document.getElementById('oradorAtualTelao').textContent = dados.oradorAtual || 'AGUARDANDO INÍCIO';
-        document.getElementById('cronometroTelao').textContent = dados.cronometro || '05:00';
-        document.getElementById('proximoOradorTelao').textContent = dados.proximoOrador || 'Próximo Orador: ---';
+        const cronEl = document.getElementById('cronometroTelao');
+        cronEl.textContent = dados.cronometro || '05:00';
+        cronEl.style.color = dados.cronometroCor || '#0787d9';
+        const proximoEl = document.getElementById('proximoOradorTelao');
+        if(dados.modoSessao === 'consideracoes'){
+            proximoEl.style.display = '';
+            proximoEl.textContent = dados.proximoOrador || 'Próximo Orador: ---';
+        } else {
+            proximoEl.style.display = 'none';
+        }
         
     } catch(e){
         console.log('Erro ao sincronizar:', e);
     }
     
 }, 500);
+
+function atualizarRelogio(){
+    const agora = new Date();
+    const hh = String(agora.getHours()).padStart(2,'0');
+    const mm = String(agora.getMinutes()).padStart(2,'0');
+    const ss = String(agora.getSeconds()).padStart(2,'0');
+    const dd = String(agora.getDate()).padStart(2,'0');
+    const mo = String(agora.getMonth()+1).padStart(2,'0');
+    const yy = String(agora.getFullYear()).slice(-2);
+    document.getElementById('relogioTelao').innerHTML = hh+':'+mm+':'+ss+'<br>'+dd+'/'+mo+'/'+yy;
+}
+atualizarRelogio();
+setInterval(atualizarRelogio, 1000);
 
 </script>
 
