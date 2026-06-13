@@ -562,7 +562,33 @@ function iniciarCronometro(){
         .textContent.trim() ===
         "AGUARDANDO INÍCIO"
     ){
-        return;
+
+        // Em considerações finais, iniciar define o primeiro da fila como orador
+        if(
+            modoSessao === "consideracoes" &&
+            filaConsideracoes.length > 0
+        ){
+            const nome = filaConsideracoes[0];
+            oradorAtualConsideracoes = nome;
+            document.getElementById("oradorAtual")
+            .textContent = nome.toUpperCase();
+
+            tempoInicial = 300;
+            tempoRestante = 300;
+            atualizarCronometro();
+
+            // Atualizar próximo orador (próximo após o atual)
+            document.getElementById("proximoOrador")
+            .textContent =
+            filaConsideracoes.length > 1
+            ? "Próximo Orador: " + filaConsideracoes[1]
+            : "Próximo Orador: ---";
+
+            salvarEstadoTelao();
+        } else {
+            return;
+        }
+
     }
 
     if(cronometroRodando){
@@ -777,16 +803,26 @@ function atualizarFilaConsideracoes(){
 
     div.innerHTML = "";
 
+    // Se há orador ativo, ele está em queue[0], próximo é queue[1]
+    const currentSpeaker =
+    document.getElementById("oradorAtual")
+    .textContent.trim();
+
+    const isSpeaking =
+    currentSpeaker !== "AGUARDANDO INÍCIO";
+
+    const nextIndex = isSpeaking ? 1 : 0;
+
     document
     .getElementById(
         "proximoOrador"
     )
     .textContent =
 
-    filaConsideracoes.length > 0
+    filaConsideracoes.length > nextIndex
 
     ? "Próximo Orador: " +
-    filaConsideracoes[0]
+    filaConsideracoes[nextIndex]
 
     : "Próximo Orador: ---";
 
@@ -897,8 +933,62 @@ function chamarProximoOrador(){
         return;
     }
 
-    const nome =
+    const currentSpeaker =
+    document.getElementById("oradorAtual")
+    .textContent.trim();
+
+    // Se ninguém está falando, iniciar o primeiro (sem remover)
+    if(currentSpeaker === "AGUARDANDO INÍCIO"){
+
+        const nome = filaConsideracoes[0];
+
+        oradorAtualConsideracoes =
+        nome;
+
+        document
+        .getElementById("oradorAtual")
+        .textContent =
+        nome.toUpperCase();
+
+        tempoInicial = 300;
+        tempoRestante = 300;
+
+        pausarCronometro();
+        atualizarCronometro();
+        atualizarFilaConsideracoes();
+
+        iniciarCronometro();
+
+        setTimeout(() => {
+            salvarEstadoTelao();
+        }, 100);
+
+        return;
+    }
+
+    // Remove o orador atual (primeiro da fila)
     filaConsideracoes.shift();
+
+    if(
+        filaConsideracoes.length === 0
+    ){
+        // Não há mais oradores
+        oradorAtualConsideracoes = "";
+        document
+        .getElementById("oradorAtual")
+        .textContent =
+        "AGUARDANDO INÍCIO";
+
+        pausarCronometro();
+        tempoInicial = 300;
+        tempoRestante = 300;
+        atualizarCronometro();
+        atualizarFilaConsideracoes();
+        return;
+    }
+
+    // Define o próximo da fila como orador (sem remover)
+    const nome = filaConsideracoes[0];
 
     oradorAtualConsideracoes =
     nome;
@@ -911,22 +1001,10 @@ function chamarProximoOrador(){
     tempoInicial = 300;
     tempoRestante = 300;
 
+    pausarCronometro();
     atualizarCronometro();
 
     atualizarFilaConsideracoes();
-
-    document
-    .getElementById(
-        "proximoOrador"
-    )
-    .textContent =
-
-    filaConsideracoes.length > 0
-
-    ? "Próximo Orador: " +
-    filaConsideracoes[0]
-
-    : "Próximo Orador: ---";
 
     iniciarCronometro();
 

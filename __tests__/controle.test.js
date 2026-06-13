@@ -167,13 +167,27 @@ describe("chamarProximoOrador", () => {
   });
   afterEach(() => jest.useRealTimers());
 
-  test("sets next speaker from queue", () => {
+  test("sets first speaker from queue when no one is speaking", () => {
     win.chamarProximoOrador();
     expect(orador()).toBe("VEREADOR ALEXANDRE DE BARROS MENDES");
   });
 
-  test("removes the called speaker from queue", () => {
+  test("advances to next speaker when someone is speaking", () => {
+    win.chamarProximoOrador(); // sets Alexandre as speaker
+    win.pausarCronometro();
+    win.chamarProximoOrador(); // removes Alexandre, sets Renato
+    expect(orador()).toBe("VEREADOR RENATO VIEIRA");
+  });
+
+  test("keeps speaker in queue when first called", () => {
     win.chamarProximoOrador();
+    expect(queueItems()).toEqual(["Vereador Alexandre de Barros Mendes", "Vereador Renato Vieira", "Vereador Paulo Cezar Tavares"]);
+  });
+
+  test("removes speaker from queue on next advance", () => {
+    win.chamarProximoOrador(); // sets Alexandre
+    win.pausarCronometro();
+    win.chamarProximoOrador(); // removes Alexandre, sets Renato
     expect(queueItems()).toEqual(["Vereador Renato Vieira", "Vereador Paulo Cezar Tavares"]);
   });
 
@@ -182,17 +196,30 @@ describe("chamarProximoOrador", () => {
     expect(proximoText()).toBe("Próximo Orador: Vereador Renato Vieira");
   });
 
+  test("updates proximoOrador after advance", () => {
+    win.chamarProximoOrador(); // Alexandre speaking
+    win.pausarCronometro();
+    win.chamarProximoOrador(); // Renato speaking
+    expect(proximoText()).toBe("Próximo Orador: Vereador Paulo Cezar Tavares");
+  });
+
   test("shows --- when no next speaker", () => {
-    win.chamarProximoOrador();
-    win.chamarProximoOrador();
-    win.chamarProximoOrador();
+    win.chamarProximoOrador(); // Alexandre
+    win.pausarCronometro();
+    win.chamarProximoOrador(); // Renato
+    win.pausarCronometro();
+    win.chamarProximoOrador(); // Paulo
     expect(proximoText()).toBe("Próximo Orador: ---");
   });
 
   test("does nothing if queue is empty", () => {
-    win.chamarProximoOrador();
-    win.chamarProximoOrador();
-    win.chamarProximoOrador();
+    win.chamarProximoOrador(); // Alexandre
+    win.pausarCronometro();
+    win.chamarProximoOrador(); // Renato
+    win.pausarCronometro();
+    win.chamarProximoOrador(); // Paulo
+    win.pausarCronometro();
+    win.chamarProximoOrador(); // empty, back to AGUARDANDO
     const before = orador();
     win.chamarProximoOrador();
     expect(orador()).toBe(before);
@@ -201,6 +228,13 @@ describe("chamarProximoOrador", () => {
   test("resets timer to 05:00", () => {
     win.chamarProximoOrador();
     expect(cronometroText()).toBe("05:00");
+  });
+
+  test("iniciar button sets first speaker and starts timer", () => {
+    win.iniciarCronometro();
+    jest.advanceTimersByTime(2000);
+    expect(orador()).toBe("VEREADOR ALEXANDRE DE BARROS MENDES");
+    expect(cronometroText()).toBe("04:58");
   });
 });
 
@@ -222,8 +256,9 @@ describe("cronômetro (timer)", () => {
     expect(cronometroText()).toBe("04:57");
   });
 
-  test("does nothing if AGUARDANDO INÍCIO", () => {
+  test("does nothing if AGUARDANDO INÍCIO in non-consideracoes mode", () => {
     win.pausarCronometro();
+    win.selecionarModo("discussao");
     doc.getElementById("oradorAtual").textContent = "AGUARDANDO INÍCIO";
     win.iniciarCronometro();
     jest.advanceTimersByTime(3000);
