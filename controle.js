@@ -26,21 +26,21 @@ VEREADORES
 
 const vereadores = [
 
-"Alexandre de Barros Mendes",
-"Aline Moreira Silva Melo",
-"André Eustaquio Alves",
-"Antônio Domingos Ximendes Trindade",
-"Aparecida Sônia Ferreira Vidal",
-"Breno Reis de Oliveira",
-"Gilson Fazolla Filgueiras",
-"Jane Cristina Lacerda Pinto",
-"José Maria Fernandes",
-"José Roberto Reis Filgueiras",
-"Lucas Rufino Zocóli",
-"Marilda Aparecida Leoncio",
-"Paulo Cezar Tavares",
-"Renato Vieira",
-"Samuel Soares da Silva"
+"Vereador Alexandre de Barros Mendes",
+"Vereadora Aline Moreira Silva Melo",
+"Vereador André Eustaquio Alves",
+"Vereador Antônio Domingos Ximendes Trindade",
+"Vereadora Aparecida Sônia Ferreira Vidal",
+"Vereador Breno Reis de Oliveira",
+"Vereador Gilson Fazolla Filgueiras",
+"Vereadora Jane Cristina Lacerda Pinto",
+"Vereador José Maria Fernandes",
+"Vereador José Roberto Reis Filgueiras",
+"Vereador Lucas Rufino Zocóli",
+"Vereadora Marilda Aparecida Leoncio",
+"Vereador Paulo Cezar Tavares",
+"Vereador Renato Vieira",
+"Vereador Samuel Soares da Silva"
 
 ];
 
@@ -53,11 +53,15 @@ function salvarEstadoTelao(){
     const oradorAtualElemento = document.getElementById("oradorAtual");
     let oradorExibir = oradorAtualElemento.textContent;
 
+    const cronEl = document.getElementById("cronometro");
+
     const estado = {
         tituloSessao: tituloSessao.textContent,
         oradorAtual: oradorExibir,
-        cronometro: document.getElementById("cronometro").textContent,
-        proximoOrador: document.getElementById("proximoOrador").textContent
+        cronometro: cronEl.textContent,
+        cronometroCor: cronEl.style.color || "",
+        proximoOrador: document.getElementById("proximoOrador").textContent,
+        modoSessao: modoSessao
     };
 
     localStorage.setItem('estadoCronometro', JSON.stringify(estado));
@@ -264,12 +268,14 @@ function registrarConvidado(){
         return;
     }
 
+    pausarCronometro();
+
     oradorTribunaLivre = nome;
 
     document.getElementById("oradorAtual").textContent = nome.toUpperCase();
 
-    tempoInicial = 300;
-    tempoRestante = 300;
+    tempoInicial = 600;
+    tempoRestante = 600;
 
     atualizarCronometro();
     salvarEstadoTelao();
@@ -280,12 +286,14 @@ function registrarConvidado(){
 
 function selecionarVereadorTribuna(nome){
 
+    pausarCronometro();
+
     oradorTribunaLivre = nome;
 
     document.getElementById("oradorAtual").textContent = nome.toUpperCase();
 
-    tempoInicial = 300;
-    tempoRestante = 300;
+    tempoInicial = 120;
+    tempoRestante = 120;
 
     atualizarCronometro();
     salvarEstadoTelao();
@@ -313,6 +321,21 @@ function selecionarModo(
         )
     );
 
+    const proximoEl =
+    document.getElementById(
+        "proximoOrador"
+    );
+
+    const btnProximoEl =
+    document.getElementById(
+        "btnProximo"
+    );
+
+    const btnReplicaEl =
+    document.getElementById(
+        "btnReplica"
+    );
+
     if(
         modo ===
         "discussao"
@@ -325,6 +348,10 @@ function selecionarModo(
         .classList.add(
             "modoAtivo"
         );
+
+        proximoEl.style.display = "none";
+        btnProximoEl.style.display = "none";
+        btnReplicaEl.style.display = "none";
 
         carregarDiscussao();
 
@@ -343,6 +370,10 @@ function selecionarModo(
             "modoAtivo"
         );
 
+        proximoEl.style.display = "";
+        btnProximoEl.style.display = "";
+        btnReplicaEl.style.display = "";
+
         carregarConsideracoes();
 
     }
@@ -359,6 +390,10 @@ function selecionarModo(
         .classList.add(
             "modoAtivo"
         );
+
+        proximoEl.style.display = "none";
+        btnProximoEl.style.display = "none";
+        btnReplicaEl.style.display = "none";
 
         carregarTribuna();
 
@@ -497,12 +532,23 @@ function formatarTempo(segundos){
 
 function atualizarCronometro(){
 
-    document
-    .getElementById("cronometro")
-    .textContent =
+    const cronEl =
+    document.getElementById("cronometro");
+
+    cronEl.textContent =
     formatarTempo(
         tempoRestante
     );
+
+    if(tempoRestante <= 0){
+        cronEl.style.color = "#d32f2f";
+    } else if(tempoRestante <= 10){
+        cronEl.style.color = "#f57c00";
+    } else if(tempoRestante <= 30){
+        cronEl.style.color = "#f9a825";
+    } else {
+        cronEl.style.color = "";
+    }
 
     salvarEstadoTelao();
 
@@ -513,10 +559,36 @@ function iniciarCronometro(){
     if(
         document
         .getElementById("oradorAtual")
-        .textContent ===
+        .textContent.trim() ===
         "AGUARDANDO INÍCIO"
     ){
-        return;
+
+        // Em considerações finais, iniciar define o primeiro da fila como orador
+        if(
+            modoSessao === "consideracoes" &&
+            filaConsideracoes.length > 0
+        ){
+            const nome = filaConsideracoes[0];
+            oradorAtualConsideracoes = nome;
+            document.getElementById("oradorAtual")
+            .textContent = nome.toUpperCase();
+
+            tempoInicial = 300;
+            tempoRestante = 300;
+            atualizarCronometro();
+
+            // Atualizar próximo orador (próximo após o atual)
+            document.getElementById("proximoOrador")
+            .textContent =
+            filaConsideracoes.length > 1
+            ? "Próximo Orador: " + filaConsideracoes[1]
+            : "Próximo Orador: ---";
+
+            salvarEstadoTelao();
+        } else {
+            return;
+        }
+
     }
 
     if(cronometroRodando){
@@ -612,29 +684,8 @@ function ativarAlarme(){
 }
 
 function tocarAlarme(){
-
-    // Tentar criar som com Web Audio API
-    try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.value = 800; // Frequência em Hz
-        oscillator.type = 'sine'; // Tipo de onda
-        
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.5);
-        
-    } catch(e){
-        console.log("Áudio não suportado");
-    }
-
+    const audio = new Audio('alarme.mp3');
+    audio.play();
 }
 
 function abrirTelao(){
@@ -722,6 +773,15 @@ function inscreverVereador(
         return;
     }
 
+    if(
+        document
+        .getElementById("oradorAtual")
+        .textContent.trim() ===
+        nome.toUpperCase()
+    ){
+        return;
+    }
+
     filaConsideracoes.push(
         nome
     );
@@ -742,6 +802,29 @@ function atualizarFilaConsideracoes(){
     }
 
     div.innerHTML = "";
+
+    // Se há orador ativo, ele está em queue[0], próximo é queue[1]
+    const currentSpeaker =
+    document.getElementById("oradorAtual")
+    .textContent.trim();
+
+    const isSpeaking =
+    currentSpeaker !== "AGUARDANDO INÍCIO";
+
+    const nextIndex = isSpeaking ? 1 : 0;
+
+    document
+    .getElementById(
+        "proximoOrador"
+    )
+    .textContent =
+
+    filaConsideracoes.length > nextIndex
+
+    ? "Próximo Orador: " +
+    filaConsideracoes[nextIndex]
+
+    : "Próximo Orador: ---";
 
     filaConsideracoes.forEach(
         (nome,index)=>{
@@ -850,8 +933,62 @@ function chamarProximoOrador(){
         return;
     }
 
-    const nome =
+    const currentSpeaker =
+    document.getElementById("oradorAtual")
+    .textContent.trim();
+
+    // Se ninguém está falando, iniciar o primeiro (sem remover)
+    if(currentSpeaker === "AGUARDANDO INÍCIO"){
+
+        const nome = filaConsideracoes[0];
+
+        oradorAtualConsideracoes =
+        nome;
+
+        document
+        .getElementById("oradorAtual")
+        .textContent =
+        nome.toUpperCase();
+
+        tempoInicial = 300;
+        tempoRestante = 300;
+
+        pausarCronometro();
+        atualizarCronometro();
+        atualizarFilaConsideracoes();
+
+        iniciarCronometro();
+
+        setTimeout(() => {
+            salvarEstadoTelao();
+        }, 100);
+
+        return;
+    }
+
+    // Remove o orador atual (primeiro da fila)
     filaConsideracoes.shift();
+
+    if(
+        filaConsideracoes.length === 0
+    ){
+        // Não há mais oradores
+        oradorAtualConsideracoes = "";
+        document
+        .getElementById("oradorAtual")
+        .textContent =
+        "AGUARDANDO INÍCIO";
+
+        pausarCronometro();
+        tempoInicial = 300;
+        tempoRestante = 300;
+        atualizarCronometro();
+        atualizarFilaConsideracoes();
+        return;
+    }
+
+    // Define o próximo da fila como orador (sem remover)
+    const nome = filaConsideracoes[0];
 
     oradorAtualConsideracoes =
     nome;
@@ -864,22 +1001,12 @@ function chamarProximoOrador(){
     tempoInicial = 300;
     tempoRestante = 300;
 
+    pausarCronometro();
     atualizarCronometro();
 
     atualizarFilaConsideracoes();
 
-    document
-    .getElementById(
-        "proximoOrador"
-    )
-    .textContent =
-
-    filaConsideracoes.length > 0
-
-    ? "Próximo Orador: " +
-    filaConsideracoes[0]
-
-    : "Próximo Orador: ---";
+    iniciarCronometro();
 
     // Forçar sincronização do telão
     setTimeout(() => {
